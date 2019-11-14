@@ -39,6 +39,9 @@ class Interpreter
     // Stack pop function
     signed long int pop();
 
+    // Misc Helper Functions
+    void print_torus();
+
 public:
     Interpreter();
     ~Interpreter();

@@ -9,7 +9,9 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    std::cout<<"Loading File: "<< argv[1]<<std::endl;
+
     Interpreter befunge_93;
-    // befunge93.load(std::string(argv[1]));
+    befunge_93.load(argv[1]);
     return befunge_93.execute();
 }

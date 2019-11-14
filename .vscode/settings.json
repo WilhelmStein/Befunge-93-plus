@@ -42,6 +42,7 @@
         "typeinfo": "cpp",
         "iterator": "cpp",
         "memory_resource": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "ctime": "cpp"
     }
 }
