@@ -3,8 +3,8 @@
 #include <string>
 #include <stack>
 
-#define TORUS_X_SIZE 80
-#define TORUS_Y_SIZE 25
+#define TORUS_X_SIZE 25
+#define TORUS_Y_SIZE 80
 
 class Interpreter
 {
@@ -21,12 +21,20 @@ class Interpreter
     short int pcx, pcy; // Program counters for the x and y dimension of the program_code respectively
     std::stack<signed long int> program_stack;
 
+    enum Direction {
+        Up,
+        Down,
+        Left,
+        Right
+    } pc_dir;
+
 
     // Program Counter alteration functions
     void inc_xcounter();
     void red_xcounter();
     void inc_ycounter();
     void red_ycounter();
+    void inc_counter();
 
     // Stack pop function
     signed long int pop();
@@ -35,5 +43,6 @@ public:
     Interpreter();
     ~Interpreter();
 
-    int execute(std::string program_path);
+    void load(std::string program_path);
+    int execute();
 };

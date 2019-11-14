@@ -19,4 +19,4 @@
 
 
 #define EXIT        '@'
-#define NULL        ' '
+#define EMPTY       ' '

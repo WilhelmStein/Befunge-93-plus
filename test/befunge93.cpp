@@ -10,5 +10,6 @@ int main(int argc, char **argv)
     }
 
     Interpreter befunge_93;
-    return befunge_93.execute(argv[1]);
+    // befunge93.load(std::string(argv[1]));
+    return befunge_93.execute();
 }
