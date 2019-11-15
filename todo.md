@@ -11,8 +11,8 @@
 - [x]  Misc
 
 ### Polishing
-- [ ] Debug
+- [x] General Debug
 - [ ] Test Cases
-- [ ] Write automation for tests
+- [x] Write automation for tests
 
 ### Threading

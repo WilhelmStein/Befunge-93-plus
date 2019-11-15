@@ -3,8 +3,8 @@
 #include <string>
 #include <stack>
 
-#define TORUS_X_SIZE 80
-#define TORUS_Y_SIZE 25
+#define TORUS_X_SIZE 25
+#define TORUS_Y_SIZE 80
 
 class Interpreter
 {
@@ -17,7 +17,7 @@ class Interpreter
         MODULO
     };*/
 
-    char program_code[TORUS_X_SIZE][TORUS_Y_SIZE]; // Program code modelled as a 80x25 torus
+    char program_code[TORUS_X_SIZE][TORUS_Y_SIZE]; // Program code modelled as a 25x80 torus
     short int pcx, pcy; // Program counters for the x and y dimension of the program_code respectively
     std::stack<signed long int> program_stack;
 
@@ -46,6 +46,6 @@ public:
     Interpreter();
     ~Interpreter();
 
-    void load(std::string program_path);
+    bool load(std::string program_path);
     int execute();
 };
