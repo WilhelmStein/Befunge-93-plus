@@ -3,8 +3,8 @@
 #include <string>
 #include <stack>
 
-#define TORUS_X_SIZE 25
-#define TORUS_Y_SIZE 80
+#define TORUS_X_SIZE 80
+#define TORUS_Y_SIZE 25
 
 class Interpreter
 {

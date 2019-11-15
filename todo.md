@@ -7,7 +7,7 @@
 - [x]  Program Movement
 - [x]  I/O
 - [x]  Flow Control
-- [ ]  Alter Program Memory
+- [x]  Alter Program Memory
 - [x]  Misc
 
 ### Polishing

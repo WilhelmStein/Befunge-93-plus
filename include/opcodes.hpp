@@ -30,6 +30,10 @@
 #define H_IF            '_'
 #define V_IF            '|'
 
+// Alter Program Memory
+#define GET             'g'
+#define PUT             'p'
 
+// Misc
 #define EXIT            '@'
 #define EMPTY           ' '

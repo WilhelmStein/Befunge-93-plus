@@ -8,9 +8,8 @@
 #include <ctime>
 
 using std::string;
-using std::ifstream;
-using std::stringstream;
 using std::cout;
+using std::cin;
 using std::endl;
 
 // Program Counter alteration functions
@@ -75,10 +74,10 @@ Interpreter::~Interpreter() {}
 
 void Interpreter::load(string program_path) // Remember to add some boundary checks and make the loading more efficient
 {
-    ifstream input_file;
+    std::ifstream input_file;
     input_file.open(program_path);
 
-    stringstream str_stream;
+    std::stringstream str_stream;
     str_stream << input_file.rdbuf();
     string code = str_stream.str();
 
@@ -124,7 +123,6 @@ int Interpreter::execute()
                 // Stack Arithmetic
                 case ADD:      program_stack.push(pop() + pop()); break;
                 case MULTIPLY: program_stack.push(pop() * pop()); break;
-
                 case SUBTRACT:
                 {
                     signed long int b = pop(), a = pop(); 
@@ -177,13 +175,53 @@ int Interpreter::execute()
 
 
                 // I/O
-                case IN_D:  break;
-                case IN_C:  break;
+                case IN_D: 
+                {
+                    signed long int v;
+                    cin>>v;
+                    program_stack.push(v);
+                    break;
+                }
+                case IN_C:
+                {
+                    program_stack.push(getchar());
+                    break;
+                }
                 case OUT_D: std::cout<<pop(); break;
                 case OUT_C: std::cout<<(char)pop(); break;
                 case STRING_MODE: string_mode = true; break;
 
 
+                // Alter Program Memory
+                case GET:
+                {
+                    signed long int y = pop(), x = pop();
+
+                    if(y >= TORUS_Y_SIZE || y < 0 || x >= TORUS_X_SIZE || x < 0)
+                    {
+                        cout<<"Error: Get command out of bounds (" << x << ", " << y << ")"<<endl;
+                        break;
+                    }
+                    
+                    program_stack.push(program_code[x][y]);
+                    break;
+                }
+                case PUT:
+                {  
+                    signed long int y = pop(), x = pop(), v = pop();
+
+                    if(y >= TORUS_Y_SIZE || y < 0 || x >= TORUS_X_SIZE || x < 0)
+                    {
+                        cout<<"Error: Put command out of bounds (" << x << ", " << y << ")"<<endl;
+                        break;
+                    }
+
+                    program_code[x][y] = v;
+                    break;
+                }
+            
+
+                // Misc
                 case EXIT: return 0;
                 case EMPTY: break;
 
