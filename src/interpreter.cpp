@@ -12,12 +12,7 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-// Program Counter alteration functions
-void Interpreter::inc_xcounter() { ( (pcx + 1) > TORUS_X_SIZE ) ? (pcx = 0) : ( pcx++ ); }
-void Interpreter::red_xcounter() { ( (pcx - 1) < 0 ) ? (pcx = TORUS_X_SIZE) : ( pcx-- ); }
-void Interpreter::inc_ycounter() { ( (pcx + 1) > TORUS_Y_SIZE ) ? (pcy = 0) : ( pcy++ ); }
-void Interpreter::red_ycounter() { ( (pcx - 1) < 0 ) ? (pcy = TORUS_Y_SIZE) : ( pcy-- ); }
-
+// Program Counter alteration function
 void Interpreter::inc_counter()
 {
     switch(pc_dir)

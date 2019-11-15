@@ -9,14 +9,6 @@
 class Interpreter
 {
 
-    /*enum Opcode {
-        ADD,
-        SUBTRACT,
-        MULTIPLY,
-        DIVIDE,
-        MODULO
-    };*/
-
     char program_code[TORUS_X_SIZE][TORUS_Y_SIZE]; // Program code modelled as a 25x80 torus
     short int pcx, pcy; // Program counters for the x and y dimension of the program_code respectively
     std::stack<signed long int> program_stack;
@@ -30,10 +22,6 @@ class Interpreter
 
 
     // Program Counter alteration functions
-    void inc_xcounter();
-    void red_xcounter();
-    void inc_ycounter();
-    void red_ycounter();
     void inc_counter();
 
     // Stack pop function
