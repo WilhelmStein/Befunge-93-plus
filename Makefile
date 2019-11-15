@@ -7,7 +7,7 @@ LIBS =
 PATH_SRC = ./src
 PATH_INC = ./include
 PATH_BIN = ./bin
-PATH_TEST = ./test
+PATH_TEST = ./main
 
 .PHONY: all
 all:

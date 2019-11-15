@@ -1,2 +1,7 @@
+#!/bin/bash
 make clean && cereal --rebuild
-./bin/befunge93.exe ./test/test6.bf
+
+for filename in ./tests/*.bf; do
+    test_output=${filename/.bf/.out}
+    diff --text <(./bin/befunge93.exe $filename) <(./Befunge-93/bin/bef $filename) > ${test_output}
+done

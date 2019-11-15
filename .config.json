@@ -9,6 +9,6 @@
     "external-libraries": [],
     "include-path": "./include",
     "source-path": "./src",
-    "test-path": "./test",
+    "test-path": "./main",
     "binaries-path": "./bin"
 }

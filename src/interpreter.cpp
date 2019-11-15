@@ -187,7 +187,7 @@ int Interpreter::execute()
                     program_stack.push(getchar());
                     break;
                 }
-                case OUT_D: std::cout<<pop(); break;
+                case OUT_D: std::cout<<pop()<<' '; break;
                 case OUT_C: std::cout<<(char)pop(); break;
                 case STRING_MODE: string_mode = true; break;
 
