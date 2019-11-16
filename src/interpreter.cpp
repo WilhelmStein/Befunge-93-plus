@@ -88,17 +88,17 @@ bool Interpreter::load(string program_path) // Remember to add some boundary che
     
     for(size_t i = 0, j = 0, k = 0; k < code.length(); k++)
     {
-        if(i > TORUS_X_SIZE || j > TORUS_Y_SIZE)
-        {
-            cout<<"Error: Program file too big."<<endl;
-            return false;
-        }
-
         if(code[k] == '\n')
         {
             i++;
             j = 0;
             continue;
+        }
+
+        if(i >= TORUS_X_SIZE || j >= TORUS_Y_SIZE)
+        {
+            cout<<"Error: Program file too big."<<endl;
+            return false;
         }
 
         program_code[i][j++] = code[k];
