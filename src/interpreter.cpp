@@ -12,6 +12,9 @@ using std::cout;
 using std::cin;
 using std::endl;
 
+#define NEXT_INSTRUCTION(labels, code, pcx, pcy) \
+    goto *(void *)(labels[code[pcx][pcy]])
+
 // Program Counter alteration function
 void Interpreter::inc_counter()
 {
@@ -107,6 +110,38 @@ bool Interpreter::load(string program_path) // Remember to add some boundary che
 
 int Interpreter::execute()
 {
+    static void* labels[] = {
+        &&add_label,
+        &&multiply_label,
+        &&subtract_label,
+        &&divide_label,
+        &&modulo_label,
+        &&duplicate_label,
+        &&swap_label,
+        &&pop_label,
+        &&negation_label,
+        &&greater_label,
+        &&right_label,
+        &&left_label,
+        &&up_label,
+        &&down_label,
+        &&random_label,
+        &&bridge_label,
+        &&h_if_label,
+        &&v_if_label,
+        &&in_d_label,
+        &&in_c_label,
+        &&out_d_label,
+        &&out_c_label,
+        &&string_mode_label_start,
+        &&string_mode_label_push,
+        &&string_mode_label_end,
+        &&get_label,
+        &&put_label,
+        &&exit_label,
+        &&empty_label
+    };
+
     bool string_mode = false;
 
     while (true)
@@ -117,8 +152,8 @@ int Interpreter::execute()
         {
             switch (opcode)
             {
-                case STRING_MODE: string_mode = false;  break;
-                default: program_stack.push(opcode);    break;
+                case STRING_MODE: string_mode_label_end:    string_mode = false; break;
+                default:          string_mode_label_push:   program_stack.push(opcode); break;
             }
         }
         else
@@ -129,79 +164,79 @@ int Interpreter::execute()
 
 
                 // Stack Arithmetic
-                case ADD:      program_stack.push(pop() + pop()); break;
-                case MULTIPLY: program_stack.push(pop() * pop()); break;
-                case SUBTRACT:
+                case ADD:       add_label:      program_stack.push(pop() + pop()); break;
+                case MULTIPLY:  multiply_label: program_stack.push(pop() * pop()); break;
+                case SUBTRACT:  subtract_label:
                 {
                     signed long int b = pop(), a = pop(); 
                     program_stack.push(a - b);
                     break;
                 }
-                case DIVIDE:
+                case DIVIDE: divide_label:
                 {
                     signed long int b = pop(), a = pop();
                     program_stack.push((b == 0) ? (a) : (a / b));
                     break;
                 }
-                case MODULO:
+                case MODULO: modulo_label:
                 {
                     signed long int b = pop(), a = pop();
                     program_stack.push((b == 0) ? (a) : (a % b));
                     break;
                 }
-                case DUPLICATE:
+                case DUPLICATE: duplicate_label:
                 {
                     signed long int a = pop();
                     program_stack.push(a);
                     program_stack.push(a); 
                     break;
                 }
-                case SWAP:
+                case SWAP: swap_label:
                 {
                     signed long int b = pop(), a = pop();
                     program_stack.push(b);
                     program_stack.push(a);
                     break;
                 }
-                case POP: pop(); break;
-                case NEGATION: program_stack.push((pop() == 0) ? (1) : (0)); break;
-                case GREATER:  program_stack.push((pop() > pop()) ? (1) : (0)); break;
+                case POP:       pop_label:      pop(); break;
+                case NEGATION:  negation_label: program_stack.push((pop() == 0) ? (1) : (0)); break;
+                case GREATER:   greater_label:  program_stack.push((pop() > pop()) ? (1) : (0)); break;
 
 
                 // Program Counter Movement 
-                case RIGHT:  pc_dir = Direction::Right; break;
-                case LEFT:   pc_dir = Direction::Left;  break; 
-                case UP:     pc_dir = Direction::Up;    break; 
-                case DOWN:   pc_dir = Direction::Down;  break;
-                case RANDOM: pc_dir = Direction(std::rand() % 4); break;
-                case BRIDGE: inc_counter(); break;
+                case RIGHT:     right_label:    pc_dir = Direction::Right; break;
+                case LEFT:      left_label:     pc_dir = Direction::Left;  break; 
+                case UP:        up_label:       pc_dir = Direction::Up;    break; 
+                case DOWN:      down_label:     pc_dir = Direction::Down;  break;
+                case RANDOM:    random_label:   pc_dir = Direction(std::rand() % 4); break;
+                case BRIDGE:    bridge_label:   inc_counter(); break;
 
 
                 // Program Control Flow
-                case H_IF: (pop() == 0) ? (pc_dir = Direction::Right) : (pc_dir = Direction::Left); break;
-                case V_IF: (pop() == 0) ? (pc_dir = Direction::Down)  : (pc_dir = Direction::Up); break;
+                case H_IF: h_if_label: (pop() == 0) ? (pc_dir = Direction::Right) : (pc_dir = Direction::Left); break;
+                case V_IF: v_if_label: (pop() == 0) ? (pc_dir = Direction::Down)  : (pc_dir = Direction::Up); break;
 
 
                 // I/O
-                case IN_D: 
+                case IN_D: in_d_label:
                 {
                     signed long int v;
                     cin>>v;
                     program_stack.push(v);
                     break;
                 }
-                case IN_C:
+                case IN_C: in_c_label:
                 {
                     program_stack.push(getchar());
                     break;
                 }
-                case OUT_D: std::cout<<pop()<<' '; break;
-                case OUT_C: std::cout<<(char)pop(); break;
-                case STRING_MODE: string_mode = true; break;
+                case OUT_D:         out_d_label:                std::cout<<pop()<<' '; break;
+                case OUT_C:         out_c_label:                std::cout<<(char)pop(); break;
+                case STRING_MODE:   string_mode_label_start:    string_mode = true; break;
 
 
                 // Alter Program Memory
-                case GET:
+                case GET: get_label:
                 {
                     signed long int x = pop(), y = pop();
 
@@ -214,7 +249,7 @@ int Interpreter::execute()
                     program_stack.push(program_code[x][y]);
                     break;
                 }
-                case PUT:
+                case PUT: put_label:
                 {  
                     signed long int x = pop(), y = pop(), v = pop();
 
@@ -230,8 +265,8 @@ int Interpreter::execute()
             
 
                 // Misc
-                case EXIT: return 0;
-                case EMPTY: break;
+                case EXIT:  exit_label:  return 0;
+                case EMPTY: empty_label: break;
 
 
                 default:

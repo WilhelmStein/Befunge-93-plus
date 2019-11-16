@@ -16,3 +16,6 @@
 - [x] Write automation for tests
 
 ### Threading
+- [x] Add Labels
+- [ ] Change way instructions are handled
+- [ ] Make it check if compiled without gcc, in order to remove threading capabilities and compile nontheless

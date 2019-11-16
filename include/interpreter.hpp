@@ -7,8 +7,7 @@
 #define TORUS_Y_SIZE 80
 
 class Interpreter
-{
-
+{    
     char program_code[TORUS_X_SIZE][TORUS_Y_SIZE]; // Program code modelled as a 25x80 torus
     short int pcx, pcy; // Program counters for the x and y dimension of the program_code respectively
     std::stack<signed long int> program_stack;
