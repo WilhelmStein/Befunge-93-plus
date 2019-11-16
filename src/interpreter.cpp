@@ -144,6 +144,8 @@ int Interpreter::execute()
 
     bool string_mode = false;
 
+    std::cout<<"Befunge-93 Interpreter/Debugger v2.25"<<std::endl;
+
     while (true)
     {
         char opcode = program_code[pcx][pcy];
@@ -160,7 +162,7 @@ int Interpreter::execute()
         {
             switch(opcode)
             {
-                case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': program_stack.push(atoi(&opcode)); break;
+                case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': program_stack.push(opcode - '0'); break;
 
 
                 // Stack Arithmetic
@@ -200,7 +202,7 @@ int Interpreter::execute()
                 }
                 case POP:       pop_label:      pop(); break;
                 case NEGATION:  negation_label: program_stack.push((pop() == 0) ? (1) : (0)); break;
-                case GREATER:   greater_label:  program_stack.push((pop() > pop()) ? (1) : (0)); break;
+                case GREATER:   greater_label:  program_stack.push((pop() < pop()) ? (1) : (0)); break;
 
 
                 // Program Counter Movement 
@@ -270,8 +272,8 @@ int Interpreter::execute()
 
 
                 default:
-                    cout<<"Error: Unknown command '"<< opcode <<"' encountered."<<endl;
-                    return -1;
+                    //cout<<"Error: Unknown command '"<< opcode <<"' encountered."<<endl;
+                    break;
             }   
         }
         inc_counter();

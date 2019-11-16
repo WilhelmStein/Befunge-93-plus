@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/befunge93.exe",
-            "args": ["${workspaceFolder}/tests/test1.bf"],
+            "args": ["${workspaceFolder}/tests/testbrdg.bf"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
