@@ -13,7 +13,7 @@ using std::cin;
 using std::endl;
 
 #define NEXT_INSTRUCTION(labels, code, pcx, pcy) \
-    goto *(void *)(labels[code[pcx][pcy]])
+    goto *(void *)((labels)[(code)[pcx][pcy]])
 
 // Program Counter alteration function
 void Interpreter::inc_counter()
@@ -110,7 +110,14 @@ bool Interpreter::load(string program_path) // Remember to add some boundary che
 
 int Interpreter::execute()
 {
-    static void* labels[128];
+    static void *labels[128], *str_mode_labels[128];
+    
+    for(size_t i = 0; i < 128; i++)
+    {
+        labels[i] = &&undefined_label;
+        str_mode_labels[i] = &&string_mode_push_label;
+    }
+
     labels[ADD] = &&add_label;
     labels[MULTIPLY] = &&multiply_label;
     labels[SUBTRACT] = &&subtract_label;
@@ -138,9 +145,10 @@ int Interpreter::execute()
     labels[PUT] = &&put_label;
     labels[EXIT] = &&exit_label;
     labels[EMPTY] = &&empty_label;
-    labels[UNDEFINED] = &&undefined_label;
+    
+    for(size_t i = '0'; i <= '9'; i++)
+        labels[i] = &&push_number_label;
 
-    static void* str_mode_labels[128];
     str_mode_labels[STRING_MODE] = &&string_mode_end_label;
 
     bool string_mode = false;
@@ -163,7 +171,7 @@ int Interpreter::execute()
         {
             switch(opcode)
             {
-                case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': program_stack.push(opcode - '0'); break;
+                case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': push_number_label: program_stack.push(opcode - '0'); break;
 
 
                 // Stack Arithmetic
@@ -278,6 +286,7 @@ int Interpreter::execute()
             }   
         }
         inc_counter();
-        NEXT_INSTRUCTION((string_mode) ? (str_mode_labels) : (labels), program_code, pcx, pcy);
+        opcode = program_code[pcx][pcy];
+        NEXT_INSTRUCTION(((string_mode) ? (str_mode_labels) : (labels)), program_code, pcx, pcy);
     }
 }

@@ -9,11 +9,11 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/befunge93.exe",
-            "args": ["${workspaceFolder}/tests/testbrdg.bf"],
+            "args": ["${workspaceFolder}/tests/hello.bf"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
