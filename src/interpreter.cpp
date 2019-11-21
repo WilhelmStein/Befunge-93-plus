@@ -110,37 +110,38 @@ bool Interpreter::load(string program_path) // Remember to add some boundary che
 
 int Interpreter::execute()
 {
-    static void* labels[] = {
-        &&add_label,
-        &&multiply_label,
-        &&subtract_label,
-        &&divide_label,
-        &&modulo_label,
-        &&duplicate_label,
-        &&swap_label,
-        &&pop_label,
-        &&negation_label,
-        &&greater_label,
-        &&right_label,
-        &&left_label,
-        &&up_label,
-        &&down_label,
-        &&random_label,
-        &&bridge_label,
-        &&h_if_label,
-        &&v_if_label,
-        &&in_d_label,
-        &&in_c_label,
-        &&out_d_label,
-        &&out_c_label,
-        &&string_mode_label_start,
-        &&string_mode_label_push,
-        &&string_mode_label_end,
-        &&get_label,
-        &&put_label,
-        &&exit_label,
-        &&empty_label
-    };
+    static void* labels[128];
+    labels[ADD] = &&add_label;
+    labels[MULTIPLY] = &&multiply_label;
+    labels[SUBTRACT] = &&subtract_label;
+    labels[DIVIDE] = &&divide_label;
+    labels[MODULO] = &&modulo_label;
+    labels[DUPLICATE] = &&duplicate_label;
+    labels[SWAP] = &&swap_label;
+    labels[POP] = &&pop_label;
+    labels[NEGATION] = &&negation_label;
+    labels[GREATER] = &&greater_label;
+    labels[RIGHT] = &&right_label;
+    labels[LEFT] = &&left_label;
+    labels[UP] = &&up_label;
+    labels[DOWN] = &&down_label;
+    labels[RANDOM] = &&random_label;
+    labels[BRIDGE] = &&bridge_label;
+    labels[H_IF] = &&h_if_label;
+    labels[V_IF] = &&v_if_label;
+    labels[IN_D] = &&in_d_label;
+    labels[IN_C] = &&in_c_label;
+    labels[OUT_D] = &&out_d_label;
+    labels[OUT_C] = &&out_c_label;
+    labels[STRING_MODE] = &&string_mode_start_label;
+    labels[GET] = &&get_label;
+    labels[PUT] = &&put_label;
+    labels[EXIT] = &&exit_label;
+    labels[EMPTY] = &&empty_label;
+    labels[UNDEFINED] = &&undefined_label;
+
+    static void* str_mode_labels[128];
+    str_mode_labels[STRING_MODE] = &&string_mode_end_label;
 
     bool string_mode = false;
 
@@ -154,8 +155,8 @@ int Interpreter::execute()
         {
             switch (opcode)
             {
-                case STRING_MODE: string_mode_label_end:    string_mode = false; break;
-                default:          string_mode_label_push:   program_stack.push(opcode); break;
+                case STRING_MODE: string_mode_end_label:    string_mode = false; break;
+                default:          string_mode_push_label:   program_stack.push(opcode); break;
             }
         }
         else
@@ -234,7 +235,7 @@ int Interpreter::execute()
                 }
                 case OUT_D:         out_d_label:                std::cout<<pop()<<' '; break;
                 case OUT_C:         out_c_label:                std::cout<<(char)pop(); break;
-                case STRING_MODE:   string_mode_label_start:    string_mode = true; break;
+                case STRING_MODE:   string_mode_start_label:    string_mode = true; break;
 
 
                 // Alter Program Memory
@@ -271,11 +272,12 @@ int Interpreter::execute()
                 case EMPTY: empty_label: break;
 
 
-                default:
+                default: undefined_label:
                     //cout<<"Error: Unknown command '"<< opcode <<"' encountered."<<endl;
                     break;
             }   
         }
         inc_counter();
+        NEXT_INSTRUCTION((string_mode) ? (str_mode_labels) : (labels), program_code, pcx, pcy);
     }
 }

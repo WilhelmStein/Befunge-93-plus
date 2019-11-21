@@ -37,3 +37,4 @@
 // Misc
 #define EXIT            '@'
 #define EMPTY           ' '
+#define UNDEFINED       0
