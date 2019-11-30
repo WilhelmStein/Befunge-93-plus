@@ -273,6 +273,12 @@ int Interpreter::execute()
                     program_code[x][y] = v;
                     break;
                 }
+
+
+                // Heap Commands
+                case CONS: break;
+                case HEAD: break;
+                case TAIL: break;
             
 
                 // Misc

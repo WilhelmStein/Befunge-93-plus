@@ -34,6 +34,11 @@
 #define GET             'g'
 #define PUT             'p'
 
+// Heap Commands
+#define CONS            'c'
+#define HEAD            'h'
+#define TAIL            't'
+
 // Misc
 #define EXIT            '@'
 #define EMPTY           ' '
