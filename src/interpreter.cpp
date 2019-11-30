@@ -13,7 +13,7 @@ using std::cin;
 using std::endl;
 
 #define NEXT_INSTRUCTION(labels, code, pcx, pcy) \
-    goto *(void *)((labels)[(code)[pcx][pcy]])
+    goto *(void *)((labels)[(size_t)(code)[(pcx)][(pcy)]])
 
 // Program Counter alteration function
 void Interpreter::inc_counter()
