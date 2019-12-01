@@ -8,28 +8,20 @@
 
 class Interpreter
 {   
-    union StackVal
+    struct StackVal
     {
-        struct Cell
-        {
-            signed long int a;
-            signed long int b;
-
-            Cell(signed long int _a, signed long int _b): a(_a), b(_b) {}
-
-        } *cell;
-
-        signed long int value;
+        signed long value : 62;
+        bool marked : 1;
+        bool is_ptr : 1;
         
         StackVal() {}
 
-        StackVal(signed long int v): value(v) {} 
+        StackVal(signed long int v): value(v), is_ptr(false) {} 
 
-        StackVal(signed long int a, signed long int b): cell(new Cell(a, b)) {}
+        StackVal(signed long int a, signed long int b): value((long) new Cell(a, b)), is_ptr(true) {}
 
         StackVal& operator=(const StackVal& b) 
         { 
-            cell = b.cell;
             value = b.value;
             return *this;
         }
@@ -40,10 +32,20 @@ class Interpreter
         }
     };
 
+    struct Cell
+    {
+        StackVal a;
+        StackVal b;
+
+        Cell(StackVal _a, StackVal _b): a(_a), b(_b) {}
+
+    };
+
 
     char program_code[TORUS_X_SIZE][TORUS_Y_SIZE]; // Program code modelled as a 25x80 torus
     short int pcx, pcy; // Program counters for the x and y dimension of the program_code respectively
     std::stack<Interpreter::StackVal> program_stack;
+
 
     enum Direction {
         Up,

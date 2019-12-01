@@ -143,6 +143,9 @@ int Interpreter::execute()
     labels[STRING_MODE] = &&string_mode_start_label;
     labels[GET] = &&get_label;
     labels[PUT] = &&put_label;
+    labels[CONS] = &&cons_label;
+    labels[HEAD] = &&head_label;
+    labels[TAIL] = &&tail_label;
     labels[EXIT] = &&exit_label;
     labels[EMPTY] = &&empty_label;
     
@@ -276,15 +279,15 @@ int Interpreter::execute()
 
 
                 // Heap Commands
-                case CONS:
+                case CONS: cons_label:
                 {
                     signed long int b = pop(), a = pop();
 
                     program_stack.push(StackVal(a, b));
                     break;
                 }
-                case HEAD: program_stack.push(pop().cell->a); break;
-                case TAIL: program_stack.push(pop().cell->b); break;
+                case HEAD: head_label: program_stack.push(((Cell*)(pop().value))->a); break;
+                case TAIL: tail_label: program_stack.push(((Cell*)(pop().value))->b); break;
             
 
                 // Misc
