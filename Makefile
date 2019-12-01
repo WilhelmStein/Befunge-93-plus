@@ -16,6 +16,7 @@ all:
 	@echo "*** Compiling object files ***"
 	@echo "***"
 	make $(OBJS)
+	make $(PATH_BIN)/befunge93.exe
 	@echo "***"
 
 .PHONY: clean

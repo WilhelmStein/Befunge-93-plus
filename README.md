@@ -12,3 +12,8 @@ Befunge-93+ is an extension of the language [Befunge-93+](https://catseye.tc/vie
 
 * `(t) tail` : Same as `h`, but for the second position of the pait.
 
+### Notes
+---
+
+Use the `makefile` to create the executable. You can use the `run.sh` to automatically run tests on this executable and cross check the output with the [original one](https://github.com/catseye/Befunge-93). Just clone the original Befunge-93 git inside the root folder of this project and use its makefile.
+

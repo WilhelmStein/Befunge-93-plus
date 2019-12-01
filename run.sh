@@ -1,5 +1,5 @@
 #!/bin/bash
-make clean && cereal --rebuild
+make clean && make all
 
 if [ $# -eq 0 ]
 then

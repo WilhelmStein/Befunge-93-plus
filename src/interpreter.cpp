@@ -28,13 +28,13 @@ void Interpreter::inc_counter()
 }
 
 // Stack Pop function
-signed long int Interpreter::pop()
+Interpreter::StackVal Interpreter::pop()
 {
-    signed long int item;
+    Interpreter::StackVal item;
 
     if(program_stack.empty())
     {
-        item = 0;
+        item.value = 0;
     }
     else
     {
@@ -276,9 +276,15 @@ int Interpreter::execute()
 
 
                 // Heap Commands
-                case CONS: break;
-                case HEAD: break;
-                case TAIL: break;
+                case CONS:
+                {
+                    signed long int b = pop(), a = pop();
+
+                    program_stack.push(StackVal(a, b));
+                    break;
+                }
+                case HEAD: program_stack.push(pop().cell->a); break;
+                case TAIL: program_stack.push(pop().cell->b); break;
             
 
                 // Misc
