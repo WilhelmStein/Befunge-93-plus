@@ -32,17 +32,42 @@ Interpreter::StackVal Interpreter::pop()
 {
     Interpreter::StackVal item;
 
-    if(program_stack.empty())
+    if(!program_stack.empty())
     {
-        item.value = 0;
-    }
-    else
-    {
-        item = program_stack.top();
-        program_stack.pop();
+        item = program_stack.back();
+        program_stack.pop_back();
+
+        mark();
+        sweep();
     }
 
     return item;
+}
+
+// Garbace Collector functions
+
+void Interpreter::mark()
+{
+    for (std::vector<StackVal>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
+        Interpreter::StackVal::dfs(*it);
+}
+
+
+void Interpreter::sweep()
+{
+    
+    for (std::vector<StackVal>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
+    {
+        if(it->is_ptr && program_heap.find(it->value) == program_heap.end())
+            delete (Cell*)it->value;
+    }
+    
+}
+
+void Interpreter::unmark()
+{
+    for (std::vector<StackVal>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
+        Interpreter::StackVal::undfs(*it);
 }
 
 // Misc Helper Functions
@@ -167,54 +192,54 @@ int Interpreter::execute()
             switch (opcode)
             {
                 case STRING_MODE: string_mode_end_label:    string_mode = false; break;
-                default:          string_mode_push_label:   program_stack.push(opcode); break;
+                default:          string_mode_push_label:   program_stack.push_back(opcode); break;
             }
         }
         else
         {
             switch(opcode)
             {
-                case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': push_number_label: program_stack.push(opcode - '0'); break;
+                case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': push_number_label: program_stack.push_back(opcode - '0'); break;
 
 
                 // Stack Arithmetic
-                case ADD:       add_label:      program_stack.push(pop() + pop()); break;
-                case MULTIPLY:  multiply_label: program_stack.push(pop() * pop()); break;
+                case ADD:       add_label:      program_stack.push_back(pop() + pop()); break;
+                case MULTIPLY:  multiply_label: program_stack.push_back(pop() * pop()); break;
                 case SUBTRACT:  subtract_label:
                 {
                     signed long int b = pop(), a = pop(); 
-                    program_stack.push(a - b);
+                    program_stack.push_back(a - b);
                     break;
                 }
                 case DIVIDE: divide_label:
                 {
                     signed long int b = pop(), a = pop();
-                    program_stack.push((b == 0) ? (a) : (a / b));
+                    program_stack.push_back((b == 0) ? (a) : (a / b));
                     break;
                 }
                 case MODULO: modulo_label:
                 {
                     signed long int b = pop(), a = pop();
-                    program_stack.push((b == 0) ? (a) : (a % b));
+                    program_stack.push_back((b == 0) ? (a) : (a % b));
                     break;
                 }
                 case DUPLICATE: duplicate_label:
                 {
                     signed long int a = pop();
-                    program_stack.push(a);
-                    program_stack.push(a); 
+                    program_stack.push_back(a);
+                    program_stack.push_back(a); 
                     break;
                 }
                 case SWAP: swap_label:
                 {
                     signed long int b = pop(), a = pop();
-                    program_stack.push(b);
-                    program_stack.push(a);
+                    program_stack.push_back(b);
+                    program_stack.push_back(a);
                     break;
                 }
                 case POP:       pop_label:      pop(); break;
-                case NEGATION:  negation_label: program_stack.push((pop() == 0) ? (1) : (0)); break;
-                case GREATER:   greater_label:  program_stack.push((pop() < pop()) ? (1) : (0)); break;
+                case NEGATION:  negation_label: program_stack.push_back((pop() == 0) ? (1) : (0)); break;
+                case GREATER:   greater_label:  program_stack.push_back((pop() < pop()) ? (1) : (0)); break;
 
 
                 // Program Counter Movement 
@@ -236,12 +261,12 @@ int Interpreter::execute()
                 {
                     signed long int v;
                     cin>>v;
-                    program_stack.push(v);
+                    program_stack.push_back(v);
                     break;
                 }
                 case IN_C: in_c_label:
                 {
-                    program_stack.push(getchar());
+                    program_stack.push_back(getchar());
                     break;
                 }
                 case OUT_D:         out_d_label:                std::cout<<pop()<<' '; break;
@@ -260,7 +285,7 @@ int Interpreter::execute()
                         break;
                     }
                     
-                    program_stack.push(program_code[x][y]);
+                    program_stack.push_back(program_code[x][y]);
                     break;
                 }
                 case PUT: put_label:
@@ -282,12 +307,13 @@ int Interpreter::execute()
                 case CONS: cons_label:
                 {
                     signed long int b = pop(), a = pop();
-
-                    program_stack.push(StackVal(a, b));
+                    StackVal s(a, b);
+                    program_stack.push_back(s);
+                    program_heap.insert(s.value);
                     break;
                 }
-                case HEAD: head_label: program_stack.push(((Cell*)(pop().value))->a); break;
-                case TAIL: tail_label: program_stack.push(((Cell*)(pop().value))->b); break;
+                case HEAD: head_label: program_stack.push_back(((Cell*)(pop().value))->a); break;
+                case TAIL: tail_label: program_stack.push_back(((Cell*)(pop().value))->b); break;
             
 
                 // Misc
