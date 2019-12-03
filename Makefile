@@ -1,6 +1,6 @@
 
 CC = g++
-CCFLAGS = -Wall -Wextra -std=c++17 -g3
+CCFLAGS = -Wall -Wextra -std=c++17 -O3
 
 LIBS = 
 

@@ -7,24 +7,32 @@
 #define TORUS_X_SIZE 25
 #define TORUS_Y_SIZE 80
 
+#define STACK_SIZE (1L << 20)
+#define HEAP_SIZE  (1L << 24)
+
 class Interpreter
 {   
-    struct StackVal
+    struct Cell;
+    
+    struct Value
     {
-        signed long int value : 62;
-        bool marked : 1;
+        signed long int value : 63;
         bool is_ptr : 1;
         
-        StackVal(): value(0), marked(false), is_ptr(false) {}
+        Value(): value(0), is_ptr(false) {}
 
-        StackVal(signed long int v): value(v), marked(false), is_ptr(false) {} 
+        Value(signed long int v): value(v), is_ptr(false) {} 
 
-        StackVal(signed long int a, signed long int b): value((signed long int) new Cell(a, b)), marked(false), is_ptr(false) {}
+        Value(Value a, Value b, Cell*& freeList): value((signed long int)freeList), is_ptr(true)
+        {
+            freeList = (Cell*) freeList->a.value;
+            ((Cell*)value)->a = a;
+            ((Cell*)value)->b = b;
+        }
 
-        StackVal& operator=(const StackVal& b) 
+        Value& operator=(const Value& b) 
         { 
             value = b.value;
-            marked = b.marked;
             is_ptr = b.is_ptr;
 
             return *this;
@@ -35,33 +43,14 @@ class Interpreter
             return value;
         }
 
-        static void dfs(StackVal& s)
+        void dfs()
         {
-            if(s.marked)
-                return;
-            else
-                s.marked = true;
-            
-            if(s.is_ptr)
-            {
-                dfs(((Cell*)s.value)->a);
-                dfs(((Cell*)s.value)->b);
-            }
-            else
-                return;
-        }
 
-        static void undfs(StackVal& s)
-        {
-            if(s.marked == false)
-                return;
-            else
-                s.marked = false;
-            
-            if(s.is_ptr)
+            if(is_ptr && !((Cell *)value)->marked)
             {
-                undfs(((Cell*)s.value)->a);
-                undfs(((Cell*)s.value)->b);
+                ((Cell *)value)->marked = true;
+                ((Cell*) value)->a.dfs();
+                ((Cell*) value)->b.dfs();
             }
             else
                 return;
@@ -70,18 +59,22 @@ class Interpreter
 
     struct Cell
     {
-        StackVal a;
-        StackVal b;
 
-        Cell(StackVal _a, StackVal _b): a(_a), b(_b) {}
+        bool marked: 1;
+        Value a;
+        Value b;
+        
+        Cell(): marked(false) {}
+        Cell(signed long int _a, signed long int _b): a(_a), b(_b), marked(false) {}
 
     };
 
 
     char program_code[TORUS_X_SIZE][TORUS_Y_SIZE]; // Program code modelled as a 25x80 torus
     short int pcx, pcy; // Program counters for the x and y dimension of the program_code respectively
-    std::vector<Interpreter::StackVal> program_stack;
-    std::unordered_set<signed long int> program_heap;
+    std::vector<Interpreter::Value> program_stack;
+    Cell *program_heap;
+    Cell *freeList;
     
 
     enum Direction {
@@ -96,12 +89,11 @@ class Interpreter
     void inc_counter();
 
     // Stack pop function
-    StackVal pop();
+    Value pop();
 
     // Garbage Collector functions
     void mark();
     void sweep();
-    void unmark();
 
     // Misc Helper Functions
     void print_torus();

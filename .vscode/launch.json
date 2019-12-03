@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/befunge93.exe",
-            "args": ["${workspaceFolder}/tests/hello.bf"],
+            "args": ["${workspaceFolder}/tests/garbage_collector_tests/ping-pong.bf"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

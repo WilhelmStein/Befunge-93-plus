@@ -28,17 +28,14 @@ void Interpreter::inc_counter()
 }
 
 // Stack Pop function
-Interpreter::StackVal Interpreter::pop()
+Interpreter::Value Interpreter::pop()
 {
-    Interpreter::StackVal item;
+    Interpreter::Value item;
 
     if(!program_stack.empty())
     {
         item = program_stack.back();
         program_stack.pop_back();
-
-        mark();
-        sweep();
     }
 
     return item;
@@ -48,27 +45,27 @@ Interpreter::StackVal Interpreter::pop()
 
 void Interpreter::mark()
 {
-    for (std::vector<StackVal>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
-        Interpreter::StackVal::dfs(*it);
+    for (std::vector<Value>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
+        it->dfs();
 }
 
 
 void Interpreter::sweep()
 {
     
-    for (std::vector<StackVal>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
+    for(size_t i = 0; i < HEAP_SIZE; i++)
     {
-        if(it->is_ptr && program_heap.find(it->value) == program_heap.end())
-            delete (Cell*)it->value;
+        if(program_heap[i].marked)
+            program_heap[i].marked = false;
+        else
+        {
+            program_heap[i].a.value = (signed long int)freeList;
+            freeList = &(program_heap[i]);
+        }
     }
     
 }
 
-void Interpreter::unmark()
-{
-    for (std::vector<StackVal>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
-        Interpreter::StackVal::undfs(*it);
-}
 
 // Misc Helper Functions
 void Interpreter::print_torus()
@@ -84,6 +81,14 @@ void Interpreter::print_torus()
 Interpreter::Interpreter()
 {
     std::srand(std::time(nullptr));
+    program_heap = new Cell[HEAP_SIZE];
+
+    freeList = program_heap;
+    for(size_t i = 0; i < HEAP_SIZE - 1; i++)
+        program_heap[i].a.value = (signed long int)&program_heap[i + 1];
+    
+    program_heap[HEAP_SIZE - 1].a.value = 0;
+    
 
     pcx = pcy = 0;
     pc_dir = Direction::Right;
@@ -93,7 +98,7 @@ Interpreter::Interpreter()
             program_code[i][j] = ' ';
 }
 
-Interpreter::~Interpreter() {}
+Interpreter::~Interpreter() { delete[] program_heap;}
 
 bool Interpreter::load(string program_path) // Remember to add some boundary checks and make the loading more efficient
 {
@@ -225,14 +230,14 @@ int Interpreter::execute()
                 }
                 case DUPLICATE: duplicate_label:
                 {
-                    signed long int a = pop();
+                    auto a = pop();
                     program_stack.push_back(a);
                     program_stack.push_back(a); 
                     break;
                 }
                 case SWAP: swap_label:
                 {
-                    signed long int b = pop(), a = pop();
+                    auto b = pop(), a = pop();
                     program_stack.push_back(b);
                     program_stack.push_back(a);
                     break;
@@ -269,8 +274,8 @@ int Interpreter::execute()
                     program_stack.push_back(getchar());
                     break;
                 }
-                case OUT_D:         out_d_label:                std::cout<<pop()<<' '; break;
-                case OUT_C:         out_c_label:                std::cout<<(char)pop(); break;
+                case OUT_D:         out_d_label:                std::cout<<pop()<<' '<<std::flush; break;
+                case OUT_C:         out_c_label:                std::cout<<(char)pop()<<std::flush; break;
                 case STRING_MODE:   string_mode_start_label:    string_mode = true; break;
 
 
@@ -306,10 +311,22 @@ int Interpreter::execute()
                 // Heap Commands
                 case CONS: cons_label:
                 {
-                    signed long int b = pop(), a = pop();
-                    StackVal s(a, b);
+                    if(freeList == 0)
+                    {
+                        mark();
+                        sweep();
+
+                        if(freeList == 0)
+                        {
+                            cout<<"Error:Heap Overflow"<<endl;
+                            return -1;
+                        }
+                    }
+
+                    Value b = pop(), a = pop();
+                    Value s(a, b, freeList);
                     program_stack.push_back(s);
-                    program_heap.insert(s.value);
+                    
                     break;
                 }
                 case HEAD: head_label: program_stack.push_back(((Cell*)(pop().value))->a); break;

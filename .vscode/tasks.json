@@ -6,7 +6,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cereal --rebuild"
+            "command": "make clean && make all"
         }
     ]
 }
