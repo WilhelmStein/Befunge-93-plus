@@ -28,7 +28,7 @@ void Interpreter::inc_counter()
 }
 
 // Stack Pop function
-Interpreter::Value Interpreter::pop()
+inline Interpreter::Value Interpreter::pop()
 {
     Interpreter::Value item;
 
@@ -43,14 +43,14 @@ Interpreter::Value Interpreter::pop()
 
 // Garbace Collector functions
 
-void Interpreter::mark()
+inline void Interpreter::mark()
 {
     for (std::vector<Value>::iterator it = program_stack.begin(); it != program_stack.end(); it++)
         it->dfs();
 }
 
 
-void Interpreter::sweep()
+inline void Interpreter::sweep()
 {
     
     for(size_t i = 0; i < HEAP_SIZE; i++)
